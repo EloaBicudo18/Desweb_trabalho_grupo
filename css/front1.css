@@ -1,0 +1,176 @@
+/* ==========================================================================
+   Estilização da Tela de Administradores (front1.css)
+   ========================================================================== */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #3a7214; /* Verde Escuro de Fundo */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Container Principal da Página */
+.container {
+    background-color: #c3f5a2; /* Fundo Verde Claro */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    max-width: 700px;
+    width: 95%;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+h1 {
+    color: #305f10;
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+p {
+    color: #3c7815;
+    font-size: 16px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* ==========================================================================
+   Estilo do Formulário e Inputs
+   ========================================================================== */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 5px;
+}
+
+label {
+    color: #305f10;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+input {
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #3a7214;
+    border-radius: 6px;
+    background-color: white;
+    color: #305f10;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus {
+    border-color: #27ae60; /* Muda de cor ao clicar */
+    box-shadow: 0 0 5px rgba(39, 174, 96, 0.3);
+}
+
+/* ==========================================================================
+   Estilo dos Botões (Seguindo seu padrão)
+   ========================================================================== */
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* Botão de Enviar / Salvar */
+.btn-submit {
+    background-color: #3a7214;
+}
+
+.btn-submit:hover {
+    background-color: #27ae60;
+    transform: translateY(-2px);
+}
+
+/* Botão de Voltar para o Menu */
+.btn-back {
+    background-color: #4a5568;
+    margin-top: 15px;
+}
+
+.btn-back:hover {
+    background-color: #2d3748;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Estilo da Tabela de Dados (Administradores Cadastrados)
+   ========================================================================== */
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+th {
+    background-color: #3a7214;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+td {
+    color: #305f10;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* Linhas alternadas na tabela para facilitar a leitura */
+tr:nth-child(even) {
+    background-color: #f7fafc;
+}
+
+.footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #c3f5a2; /* Texto claro para contrastar com o fundo verde escuro */
+    text-align: center;
+}

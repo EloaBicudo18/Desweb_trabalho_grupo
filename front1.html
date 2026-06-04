@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerenciamento de Administradores</title>
+    <link rel="stylesheet" href="css/front1.css">
+    <style>
+        /* Mantendo apenas a regra de controle dinâmico do botão que o JS usa */
+        #cancelBtn { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <h1>Gerenciamento de Administradores</h1>
+        <p>Cadastre, altere ou remova administradores do sistema</p>
+        
+        <form id="adminForm">
+            <div class="form-group">
+                <label for="nome_adm">Nome:</label>
+                <input type="text" id="nome_adm" placeholder="Nome do Administrador" required />
+            </div>
+            <div class="form-group">
+                <label for="email_adm">E-mail:</label>
+                <input type="email" id="email_adm" placeholder="E-mail" required />
+            </div>
+            <div class="form-group">
+                <label for="senha_adm">Senha:</label>
+                <input type="password" id="senha_adm" placeholder="Senha" required />
+            </div>
+            
+            <div class="form-group">
+                <label>Papel/Função:</label>
+                <div style="display: flex; gap: 20px; margin-top: 5px;">
+                    <label style="font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="papel_adm" value="suporte" checked /> Adm de suportes
+                    </label>
+                    <label style="font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="papel_adm" value="coleta" /> Moderador pontos coleta
+                    </label>
+                    <label style="font-weight: normal; cursor: pointer;">
+                        <input type="radio" name="papel_adm" value="blog" /> Adm blog
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" id="submitBtn" class="btn btn-submit">Cadastrar</button>
+            <button type="button" id="cancelBtn" class="btn btn-back">Cancelar Edição</button>
+        </form>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Papel</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="adminsTable"></tbody>
+            </table>
+        </div>
+
+        <a href="index.html" class="btn btn-back" style="margin-top: 30px;">⬅ Voltar ao Menu Principal</a>
+
+    </div>
+
+    <div class="footer">
+        Desenvolvido pelo Grupo &copy; 2026
+    </div>
+
+    <script>
+        let administradores = [];
+        let adminAtualId = null;
+
+        const URL_API = "http://localhost:3000/administrador";
+
+        function displayAdmins() {
+            const tbody = document.getElementById("adminsTable");
+            tbody.innerHTML = "";
+            
+            administradores.forEach((admin) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${admin.id}</td>
+                    <td>${admin.nome_adm}</td>
+                    <td>${admin.email_adm}</td>
+                    <td>
+                        ${admin.papel_adm === 'suporte' ? 'Adm de suportes' : 
+                          admin.papel_adm === 'coleta' ? 'Moderador pontos coleta' : 
+                          admin.papel_adm === 'blog' ? 'Adm blog' : admin.papel_adm}
+                    </td>
+                    <td>
+                        <button class="btn btn-submit" style="padding: 5px 10px; display: inline; width: auto; font-size: 12px;" onclick="editAdmin(${admin.id})">Alterar</button>
+                        <button class="btn btn-back" style="padding: 5px 10px; display: inline; width: auto; font-size: 12px; margin: 0;" onclick="deleteAdmin(${admin.id})">Remover</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function editAdmin(id) {
+            adminAtualId = id;
+            const admin = administradores.find((a) => a.id === id);
+            
+            document.getElementById("nome_adm").value = admin.nome_adm;
+            document.getElementById("email_adm").value = admin.email_adm;
+            document.getElementById("senha_adm").value = admin.senha_adm;
+            
+            // Ativa a bolinha correta baseada no valor que veio do banco de dados
+            document.querySelector(`input[name="papel_adm"][value="${admin.papel_adm}"]`).checked = true;
+            
+            document.getElementById("submitBtn").innerText = "Atualizar";
+            document.getElementById("cancelBtn").style.display = "inline-block";
+        }
+
+        function deleteAdmin(id) {
+            if (confirm("Tem certeza que deseja remover este administrador?")) {
+                fetch(`${URL_API}/${id}`, {
+                    method: "DELETE",
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error("Erro ao deletar");
+                    administradores = administradores.filter((a) => a.id !== id);
+                    displayAdmins();
+                })
+                .catch((error) => console.error("Error:", error));
+            }
+        }
+
+        document.getElementById("adminForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            
+            const adminData = {
+                nome_adm: document.getElementById("nome_adm").value,
+                email_adm: document.getElementById("email_adm").value,
+                senha_adm: document.getElementById("senha_adm").value,
+                // Captura a bolinha que estiver checada no momento do envio
+                papel_adm: document.querySelector('input[name="papel_adm"]:checked').value,
+            };
+
+            if (adminAtualId) {
+                fetch(`${URL_API}/${adminAtualId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(adminData),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    const index = administradores.findIndex((a) => a.id === adminAtualId);
+                    administradores[index] = data;
+                    displayAdmins();
+                    resetForm();
+                })
+                .catch((error) => console.error("Error:", error));
+            } else {
+                fetch(URL_API, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(adminData),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    administradores.push(data);
+                    displayAdmins();
+                    resetForm();
+                })
+                .catch((error) => console.error("Error:", error));
+            }
+        });
+
+        document.getElementById("cancelBtn").addEventListener("click", resetForm);
+
+        function resetForm() {
+            adminAtualId = null;
+            document.getElementById("adminForm").reset();
+            
+            // Retorna a seleção padrão para a primeira opção (suporte)
+            document.querySelector('input[name="papel_adm"][value="suporte"]').checked = true;
+            
+            document.getElementById("submitBtn").innerText = "Cadastrar";
+            document.getElementById("cancelBtn").style.display = "none";
+        }
+
+        fetch(URL_API)
+            .then((response) => response.json())
+            .then((data) => {
+                administradores = data;
+                displayAdmins();
+            })
+            .catch((error) => console.error("Erro ao buscar administradores:", error));
+    </script>
+</body>
+</html>

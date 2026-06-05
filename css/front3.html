@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>EcoPonto | Gestão de Pontos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; }
+        .navbar { background-color: #2d6a4f; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: #2d6a4f; border: none; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+        <span class="navbar-brand">🌿 EcoPonto Sistema</span>
+        <div class="navbar-nav">
+            <a class="nav-link" href="front3.html">Pontos de Coleta</a>
+            <a class="nav-link" href="front2.html">Suporte</a>
+            <a class="nav-link" href="front1.html">Administradores</a>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card p-4">
+                <h5>Cadastrar Ponto</h5>
+                <input type="text" id="local" class="form-control mb-2" placeholder="Nome do Local">
+                <input type="text" id="endereco" class="form-control mb-2" placeholder="Endereço">
+                <input type="text" id="cidade" class="form-control mb-2" placeholder="Cidade">
+                <input type="text" id="tipo" class="form-control mb-2" placeholder="Tipo de Descarte">
+                <button onclick="salvarPonto()" class="btn btn-primary w-100">Salvar</button>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <table class="table table-hover bg-white rounded shadow-sm">
+                <thead><tr><th>Local</th><th>Endereço</th><th>Cidade</th><th>Ações</th></tr></thead>
+                <tbody id="tabelaPontos"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = "http://localhost:3007/pontos"; // Porta 3007 conforme server_pontos.js
+
+    function listar() {
+        fetch(API).then(r => r.json()).then(dados => {
+            let html = "";
+            dados.forEach(p => {
+                html += `<tr><td>${p.local}</td><td>${p.endereco}</td><td>${p.cidade}</td>
+                <td><button class="btn btn-danger btn-sm" onclick="excluir(${p.id})">🗑️</button></td></tr>`;
+            });
+            document.getElementById("tabelaPontos").innerHTML = html;
+        });
+    }
+
+    function salvarPonto() {
+        const dados = {
+            local: document.getElementById("local").value,
+            endereco: document.getElementById("endereco").value,
+            cidade: document.getElementById("cidade").value,
+            tipo_descarte: document.getElementById("tipo").value
+        };
+        fetch(API, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dados)
+        }).then(() => { listar(); document.querySelectorAll('input').forEach(i => i.value=''); });
+    }
+
+    function excluir(id) {
+        if(confirm("Excluir este ponto?")) {
+            fetch(`${API}/${id}`, { method: 'DELETE' }).then(() => listar());
+        }
+    }
+    listar();
+</script>
+</body>
+</html>
